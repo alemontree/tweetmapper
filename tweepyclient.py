@@ -63,4 +63,4 @@ if __name__ == '__main__':
 
     stream = Stream(auth, l)
     stream.filter(track=['NYPD'])
-    # stream.sample()
+ 
