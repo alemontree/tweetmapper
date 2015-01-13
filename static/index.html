@@ -7,19 +7,20 @@
     </style>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB29i3sxB7GuKeeDCX3fVBbcQEJPquT5fs"></script>
     <script type="text/javascript" src="js/lib/socket.io/socket.io.js"></script>
-    <script type="text/javascript">
+    <script type="text/javascript">    
       var map;
+      var geocoder;
 
       function initialize() {
+        geocoder = new google.maps.Geocoder();
         var mapOptions = {
           center: { lat: 40.5, lng: -95},
           zoom: 5
         };
         map = new google.maps.Map(document.getElementById('map-canvas'),
           mapOptions);
-
-
       }
+
       google.maps.event.addDomListener(window, 'load', initialize);
 
       var sio = io.connect('http://localhost:5000');
@@ -27,26 +28,19 @@
         console.log("Connected to socket.io server");
         // For some reason we have to ping the server for broadcasts to work.
         sio.send('connected');
-        sio.on('message', function (json) {
-          console.log("loc =" + json);
-          coordinates = JSON.parse(json);
-
-          console.log("Broadcast incoming: " + json);
-          console.log("lat= " + coordinates.lat);
-          console.log("lng= " + coordinates.lng);
-
-          lat = coordinates.lat;
-          lng = coordinates.lng;
-
-          var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(lat,lng),
-            map: map,
-            draggable: true,
-            animation: google.maps.Animation.DROP,
-            title:"Hello World!"
-
-          //   TODO change title to location
-          });
+        sio.on('message', function (address) {
+          geocoder.geocode( { 'address': address}, function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                var marker = new google.maps.Marker({
+                    map: map,
+                    animation: google.maps.Animation.DROP,
+                    position: results[0].geometry.location,
+                    title: address
+                });
+              } else {
+                console.log('Geocode was not successful for the following reason: ' + status + '. Address = ' + address);
+              }
+            });
 
         });
 

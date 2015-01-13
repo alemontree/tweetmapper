@@ -8,14 +8,10 @@ import json
 import urllib2
 import threading
 
-print("I AM GOING CRAZY x2 ")
-
 app = Flask(__name__, static_url_path='')
-app.debug = True
+app.debug = False
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
-
-client_count = 0
 
 @app.route('/')
 def map():
@@ -25,11 +21,6 @@ def map():
 @socketio.on('message')
 def handle_message(message):
     print 'message from client: ' + message
-
-@socketio.on('client-connected')
-def handle_message(message):
-    print 'client-connected'
-    client_count = client_count + 1
 
 @app.route('/bcast')
 def broadcast():
@@ -49,15 +40,14 @@ def error_handler(e):
 
 
 
-class StdOutListener(StreamListener):
+class TweetListener(StreamListener):
     """ A listener handles tweets are the received from the stream.
     This is a basic listener that just prints received tweets to stdout.
     """
     
     def __init__(self, socketio):
-        # super(StdOutListener, self).__init__()
+        super(TweetListener, self).__init__()
         self.socketio = socketio
-        print("THIS IS GETTING PRINTED TWICE")
 
 
     def on_data(self, data):
@@ -73,34 +63,8 @@ class StdOutListener(StreamListener):
             loc = parsed_data["user"]["location"]
             if not loc:
                 return True             
-
-            #loc = loc.encode('ascii', 'ignore')
-            #loc = urllib2.quote(loc)
-
-            print(loc, threading.current_thread())
+            print(loc)
             self.socketio.send(loc)
-
-
-
-            #self.socketio.send('{{"lat":{},"lng":{}}}'.format(lat, lng), json=True)
-
-            # url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s" % loc
-            # print(url)
-            # response = urllib2.urlopen(url)
-            # geocode_json = response.read()
-            # parsed_geodata = json.loads(geocode_json)
-            # if len(parsed_geodata["results"]) == 0:
-            #     return True
-
-
-
-
-            # lat = parsed_geodata["results"][0]["geometry"]["location"]["lat"]
-            # lng = parsed_geodata["results"][0]["geometry"]["location"]["lng"]
-            # print(lat, lng)
-
-            # self.socketio.send('{{"lat":{},"lng":{}}}'.format(lat, lng), json=True)
-
         return True
 
     def on_exception(self, exception):
@@ -123,8 +87,7 @@ def start_stream(stream):
     # stream.filter(track=['NYPD'])
 
 if __name__ == "__main__":
-    print("I AM GOING CRAZY")
-    l = StdOutListener(socketio)
+    l = TweetListener(socketio)
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     stream = Stream(auth, l)
@@ -134,4 +97,4 @@ if __name__ == "__main__":
     t.start()
 
 
-    socketio.run(app) # blocking
+    socketio.run(app)
