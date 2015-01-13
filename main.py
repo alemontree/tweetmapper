@@ -13,6 +13,8 @@ app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
+client_count = 0
+
 @app.route('/')
 def map():
     return app.send_static_file('index.html')
@@ -21,6 +23,11 @@ def map():
 @socketio.on('message')
 def handle_message(message):
     print 'message from client: ' + message
+
+@socketio.on('client-connected')
+def handle_message(message):
+    print 'client-connected'
+    client_count = client_count + 1
 
 @app.route('/bcast')
 def broadcast():
@@ -62,9 +69,17 @@ class StdOutListener(StreamListener):
         else:
             loc = parsed_data["user"]["location"]
             if not loc:
-                return True
+                return True             
+
             loc = loc.encode('ascii', 'ignore')
             loc = urllib2.quote(loc)
+
+            # print(loc)
+            # self.socketio.send(loc)
+
+
+            self.socketio.send('{{"lat":{},"lng":{}}}'.format(lat, lng), json=True)
+
             url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s" % loc
             print(url)
             response = urllib2.urlopen(url)
@@ -72,12 +87,10 @@ class StdOutListener(StreamListener):
             parsed_geodata = json.loads(geocode_json)
             if len(parsed_geodata["results"]) == 0:
                 return True
-#    "results" : [],
-#    "status" : "ZERO_RESULTS"
+
 # }
 
 
-            #print(parsed_geodata["results"])
             lat = parsed_geodata["results"][0]["geometry"]["location"]["lat"]
             lng = parsed_geodata["results"][0]["geometry"]["location"]["lng"]
             print(lat, lng)
@@ -105,7 +118,8 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
 def start_stream(stream):
-    stream.filter(track=['NYPD'])
+    stream.filter(track=['Buckeyes'])
+    # stream.filter(track=['NYPD'])
 
 
 stream = Stream(auth, l)
@@ -117,10 +131,4 @@ t.start()
 
 if __name__ == "__main__":
     socketio.run(app)
-
-
-# for u in theurls:
-#     t = threading.Thread(target=get_url, args = (q,u))
-#     t.daemon = True
-#     t.start()
 
