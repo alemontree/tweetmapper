@@ -14,6 +14,10 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 @app.route('/')
+def home():
+    return app.send_static_file('about.html')
+
+@app.route('/tweetmapper')
 def map():
     return app.send_static_file('index.html')
 
