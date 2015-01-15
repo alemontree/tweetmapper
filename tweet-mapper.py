@@ -7,6 +7,7 @@ from tweepy import Stream
 import json
 import urllib2
 import threading
+import config
 
 app = Flask(__name__, static_url_path='')
 app.debug = False
@@ -55,21 +56,26 @@ class TweetListener(StreamListener):
 
 
     def on_data(self, data):
-        parsed_data = json.loads(data)
-        
-        coordinates = parsed_data["coordinates"]
-        if coordinates:
-            print(parsed_data["text"])
-            print(parsed_data["user"]["name"])
-            print(parsed_data["coordinates"])
-            print()
-        else:
+        try:
+            parsed_data = json.loads(data)
+            
+            coordinates = parsed_data["coordinates"]
+            # if coordinates:
+            #     print(parsed_data["text"])
+            #     print(parsed_data["user"]["name"])
+            #     print(parsed_data["coordinates"])
+            #     print()
+            
             loc = parsed_data["user"]["location"]
             if not loc:
                 return True             
             print(loc)
             self.socketio.send(loc)
-        return True
+            return True
+        except Exception as e:
+            print("Unexpected exception: ",)
+            print(traceback.format_exc())
+            return True
 
     def on_exception(self, exception):
         print("exception: " + str(exception))
@@ -87,7 +93,7 @@ access_token_secret="meHvXUBQWr3HLnTfVgkNPEXvzgtgJ8oyCmKPLYtaGKNVg"
 
 
 def start_stream(stream):
-    stream.filter(track=['Buckeyes']) # blocking
+    stream.filter(track=['#BlackLivesMatter']) # blocking
     # stream.filter(track=['NYPD'])
 
 if __name__ == "__main__":
@@ -101,4 +107,4 @@ if __name__ == "__main__":
     t.start()
 
 
-    socketio.run(app)
+    socketio.run(app, host=config.host, port=config.port)

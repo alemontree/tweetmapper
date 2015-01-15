@@ -7,7 +7,10 @@
     </style>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB29i3sxB7GuKeeDCX3fVBbcQEJPquT5fs"></script>
     <script type="text/javascript" src="js/lib/socket.io/socket.io.js"></script>
-    <script type="text/javascript">    
+    <script type="text/javascript" src="js/config.js"></script>
+    <script type="text/javascript">
+      console.log("socket host: " + host);
+      console.log("socket port: " + port);
       var map;
       var geocoder;
 
@@ -23,7 +26,7 @@
 
       google.maps.event.addDomListener(window, 'load', initialize);
 
-      var sio = io.connect('http://localhost:5000');
+      var sio = io.connect('http://' + host + ':' + port);
       sio.on('connect', function (data) {
         console.log("Connected to socket.io server");
         // For some reason we have to ping the server for broadcasts to work.
@@ -71,7 +74,7 @@
   <body>
       <div id="map-canvas"></div>
       <div id="panel">
-        Listening for #Buckeyes
+        <font size="5" color="red">Listening for #BlackLivesMatter</font>
       </div>
       <a target="_blank" href="https://github.com/lemontree3417/TwitterMapper"><img style="position: absolute; top: 0; right: 0; border: 0; z-index: 5;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
   </body>
