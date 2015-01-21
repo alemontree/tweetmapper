@@ -28,27 +28,13 @@ def map():
 def handle_message(message):
     print 'message from client: ' + message
 
-@app.route('/bcast')
-def broadcast():
-    print 'broadcasting'
-    socketio.emit('test', 'this is the server speaking ' + str(time.time()))
-    socketio.send('asdf')
-    return "broadcasted"
-
-@app.route('/map')
-def send_marker():
-    socketio.send('{"lat":35,"lng":-120}', json=True)
-    return "mapped"
-
 @socketio.on_error()
 def error_handler(e):
     print 'error: ' + e
 
 
-
 class TweetListener(StreamListener):
-    """ A listener handles tweets are the received from the stream.
-    This is a basic listener that just prints received tweets to stdout.
+    """Listens for tweets and sends users' locations via SocketIO
     """
     
     def __init__(self, socketio):
@@ -89,13 +75,9 @@ consumer_secret="bGOTUWos8N2XkssW7KCSJxkuOJgH2s9oOgyoHLOLQeE5RquIFs"
 access_token="22721579-VjNiIU7xErbaADurQdS6VIwlBeMi6SzUlIT4j5R7A"
 access_token_secret="meHvXUBQWr3HLnTfVgkNPEXvzgtgJ8oyCmKPLYtaGKNVg"
 
-  
-
-
 
 def start_stream(stream):
     stream.filter(track=['#BlackLivesMatter']) # blocking
-    # stream.filter(track=['NYPD'])
 
 if __name__ == "__main__":
     l = TweetListener(socketio)
@@ -106,6 +88,5 @@ if __name__ == "__main__":
     t.daemon = True
 
     t.start()
-
 
     socketio.run(app, host=config.host, port=config.port)
