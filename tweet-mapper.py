@@ -45,13 +45,17 @@ class TweetListener(StreamListener):
 
     def on_data(self, data):
         try:
-            parsed_data = json.loads(data)            
-            coordinates = parsed_data["coordinates"]
-            
+            parsed_data = json.loads(data)
+                       
+            #coordinates = parsed_data["coordinates"]
+            if not "user" in parsed_data:
+                logging.warning("USER KEY MISSING\n", parsed_data)
+                return True
             loc = parsed_data["user"]["location"]
             if not loc:
+                #logging.warning(parsed_data) 
                 return True             
-            logging.info(loc)
+            #logging.warning(loc)
             self.socketio.send(loc)
             return True
         except Exception as e:
@@ -61,6 +65,10 @@ class TweetListener(StreamListener):
 
     def on_exception(self, exception):
         logging.error("exception: %s", str(exception))
+
+    def on_error(self, status_code):
+        logging.error("Error code {}".format(status_code))
+        return False
 
 
 consumer_key="y6avwjoMCJ1NwBEUXRVlK3kNW"
@@ -75,6 +83,6 @@ if __name__ == "__main__":
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     stream = Stream(auth, l)
-    stream.filter(track=['#android'], async=True) # blocking
+    stream.filter(track=['#android'], async=True, stall_warnings=True) # blocking
 
     socketio.run(app, host=config.host, port=config.port)
