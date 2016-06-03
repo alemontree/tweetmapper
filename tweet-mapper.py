@@ -16,7 +16,6 @@ app = Flask(__name__, static_url_path='')
 app.debug = False
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
-print secrets
 
 @app.route('/')
 def home():
