@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask.ext.socketio import SocketIO
 import time
+from keys import secrets
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
@@ -15,6 +16,7 @@ app = Flask(__name__, static_url_path='')
 app.debug = False
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+print secrets
 
 @app.route('/')
 def home():
@@ -71,17 +73,13 @@ class TweetListener(StreamListener):
         return False
 
 
-consumer_key="y6avwjoMCJ1NwBEUXRVlK3kNW"
-consumer_secret="bGOTUWos8N2XkssW7KCSJxkuOJgH2s9oOgyoHLOLQeE5RquIFs"
 
-access_token="22721579-VjNiIU7xErbaADurQdS6VIwlBeMi6SzUlIT4j5R7A"
-access_token_secret="meHvXUBQWr3HLnTfVgkNPEXvzgtgJ8oyCmKPLYtaGKNVg"
 
 
 if __name__ == "__main__":
     l = TweetListener(socketio)
-    auth = OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
+    auth = OAuthHandler(secrets['consumer_key'], secrets['consumer_secret'])
+    auth.set_access_token(secrets['access_token'], secrets['access_token_secret'])
     stream = Stream(auth, l)
     stream.filter(track=['#android'], async=True, stall_warnings=True) # blocking
 

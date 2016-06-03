@@ -1,0 +1,57 @@
+ body {
+    color: #F8F8F2;
+    font-family: helvetica;
+    background-color: #272822;
+    
+ }
+ .links {
+    text-align: center;
+    position: relative;
+    width: 550px;
+    left: 50%;
+    right: 50%;
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+
+ }
+ .links a:link {
+  padding: 0.5em;
+ }
+
+ #profilePic {
+    position: relative; 
+    left: 50%;
+    right: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin bottom: 50px;
+
+ }
+ a:link {
+    color: #F92672;
+    text-decoration: none;
+    font-size: x-large;
+
+ }
+ a:visited {
+    color: #F92672;
+ }
+
+ #about {
+    margin-top: 30px; 
+    position: relative; 
+    left: 50%;
+    right: 50%;
+    margin-left: auto;
+    margin-right: auto;
+
+    font-size: x-large;
+    width: 550px;
+    text-align: center;
+
+ }
+ .projects {
+    list-style-type: none;
+    margin-left: -25px;
+ }
