@@ -28,11 +28,11 @@ def map():
 
 @socketio.on('message')
 def handle_message(message):
-    logging.info('message from client: %s', message)
+    logging.info('message from client: {}'.format(message))
 
 @socketio.on_error()
 def error_handler(e):
-    logging.error('error: %s', e) 
+    logging.error('error: {}'.format(e)) 
 
 
 class TweetListener(StreamListener):
@@ -60,12 +60,11 @@ class TweetListener(StreamListener):
             self.socketio.send(loc)
             return True
         except Exception as e:
-            logging.error("Unexpected exception: %s", 
-                traceback.format_exc())
+            logging.error('Unexpected exception: {}'.format(traceback.format_exc(e)))
             return True
 
     def on_exception(self, exception):
-        logging.error("exception: %s", str(exception))
+        logging.error("exception: {}".format(str(exception)))
 
     def on_error(self, status_code):
         logging.error("Error code {}".format(status_code))
