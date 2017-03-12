@@ -79,6 +79,6 @@ if __name__ == "__main__":
     auth = OAuthHandler(secrets['consumer_key'], secrets['consumer_secret'])
     auth.set_access_token(secrets['access_token'], secrets['access_token_secret'])
     stream = Stream(auth, l)
-    stream.filter(track=['#android'], async=True, stall_warnings=True) # blocking
+    stream.filter(track=['#BlackLivesMatter'], async=True, stall_warnings=True) # blocking
 
     socketio.run(app, host=config.host, port=config.port)

@@ -1,6 +1,7 @@
 venv/
 keys.py
 keys.pyc
+*.pyc
 nohup.out
 nohup info
 mapsapikey
