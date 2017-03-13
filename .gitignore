@@ -3,7 +3,11 @@ keys.py
 keys.pyc
 *.pyc
 nohup.out
+socket.html
+mapperconfig.py
+indexGoogleAPIMap.html
 nohup info
 mapsapikey
 static/mikhail_shnayder_resume.pdf
+static/picture2.jpg
 webreq.py

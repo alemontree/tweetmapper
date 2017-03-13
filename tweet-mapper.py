@@ -1,16 +1,18 @@
 from flask import Flask, render_template
-from flask.ext.socketio import SocketIO
+from flask_socketio import SocketIO
 import time
 from keys import secrets
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 import json
-import urllib2
+# import urllib2
+# import urllib3
 import logging
 import config
 import traceback
 
+# urllib3.disable_warnings()
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.WARNING)
 app = Flask(__name__, static_url_path='')
 app.debug = False
@@ -56,7 +58,7 @@ class TweetListener(StreamListener):
             if not loc:
                 #logging.warning(parsed_data) 
                 return True             
-            #logging.warning(loc)
+            logging.info(loc)
             self.socketio.send(loc)
             return True
         except Exception as e:
@@ -64,7 +66,7 @@ class TweetListener(StreamListener):
             return True
 
     def on_exception(self, exception):
-        logging.error("exception: {}".format(str(exception)))
+        logging.error("Exception: {}".format(str(exception)))
 
     def on_error(self, status_code):
         logging.error("Error code {}".format(status_code))
@@ -79,6 +81,21 @@ if __name__ == "__main__":
     auth = OAuthHandler(secrets['consumer_key'], secrets['consumer_secret'])
     auth.set_access_token(secrets['access_token'], secrets['access_token_secret'])
     stream = Stream(auth, l)
-    stream.filter(track=['#BlackLivesMatter'], async=True, stall_warnings=True) # blocking
+    stream.filter(track=['#BlackLivesMatter'], async=True, stall_warnings=True) # blocking    
 
+
+    # while True: 
+    #     try:
+    #         stream = Stream(auth, l)
+    #         stream.filter(track=['#BlackLivesMatter'], async=True, stall_warnings=True) # blocking
+    #     except KeyboardInterrupt:
+    #         break
+    #     except:
+    #         continue
     socketio.run(app, host=config.host, port=config.port)
+
+    # try: 
+    #     socketio.run(app, host=config.host, port=config.port)
+    # except KeyboardInterrupt:
+    #     logging.error("Keyboard Interrupt")
+        
