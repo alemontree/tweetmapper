@@ -27,6 +27,9 @@ def home():
 def map():
     return app.send_static_file('index.html')
 
+@app.route('/robots.txt')
+def robot():
+    return app.send_static_file('robots.txt')
 
 @socketio.on('message')
 def handle_message(message):
@@ -65,12 +68,30 @@ class TweetListener(StreamListener):
             logging.error('Unexpected exception: {}'.format(traceback.format_exc(e)))
             return True
 
+    def on_timeout(self):
+        logging.warning("Timeout Occured")
+        return
+
+    def on_disconnect(self, notice):
+        """Called when twitter sends a disconnect notice
+        Disconnect codes are listed here:
+        https://dev.twitter.com/docs/streaming-apis/messages#Disconnect_messages_disconnect
+        """
+        logging.warning("disconnect: {}".format(notice))
+        return True
+
     def on_exception(self, exception):
         logging.error("Exception: {}".format(str(exception)))
+        return True
 
     def on_error(self, status_code):
         logging.error("Error code {}".format(status_code))
-        return False
+        if status_code == 420:
+            #returning False in on_error disconnects the stream
+            return False
+
+        # returning non-False reconnects the stream, with backoff.
+        return True
 
 
 
@@ -83,15 +104,13 @@ if __name__ == "__main__":
     stream = Stream(auth, l)
     stream.filter(track=['#BlackLivesMatter'], async=True, stall_warnings=True) # blocking    
 
-
     # while True: 
     #     try:
     #         stream = Stream(auth, l)
     #         stream.filter(track=['#BlackLivesMatter'], async=True, stall_warnings=True) # blocking
-    #     except KeyboardInterrupt:
-    #         break
     #     except:
     #         continue
+    print ("app running on port {}".format(config.port))
     socketio.run(app, host=config.host, port=config.port)
 
     # try: 
